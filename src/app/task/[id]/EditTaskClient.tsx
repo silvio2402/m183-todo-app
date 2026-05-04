@@ -10,19 +10,21 @@ export default function EditTaskClient({ task }: { task: Task }) {
   const [title, setTitle] = useState(task.title)
   const [state, setState] = useState(task.state)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!title.trim()) return
-    
+
     setLoading(true)
-    try {
-      await updateTask(task.id, title, state)
-      router.push("/")
-    } catch (error) {
-      console.error(error)
+    setError(null)
+    const result = await updateTask(task.id, title, state)
+    if (!result.success) {
+      setError(typeof result.error === "string" ? result.error : "Something went wrong")
       setLoading(false)
+      return
     }
+    router.push("/")
   }
 
   return (
@@ -36,6 +38,10 @@ export default function EditTaskClient({ task }: { task: Task }) {
             Modify the description or state of your task.
           </p>
         </div>
+
+        {error && (
+          <p className="mb-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{error}</p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">

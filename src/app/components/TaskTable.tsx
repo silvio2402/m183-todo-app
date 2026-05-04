@@ -16,7 +16,8 @@ export default function TaskTable({ tasks: initialTasks }: { tasks: Task[] }) {
 
   const stateMutation = useMutation({
     mutationFn: async ({ id, state }: { id: number, state: string }) => {
-      await updateTaskState(id, state)
+      const result = await updateTaskState(id, state)
+      if (!result.success) throw new Error(typeof result.error === "string" ? result.error : "Something went wrong")
     },
     onMutate: async ({ id, state }) => {
       setTasks(prev => prev.map(t => t.id === id ? { ...t, state } : t))
@@ -25,7 +26,8 @@ export default function TaskTable({ tasks: initialTasks }: { tasks: Task[] }) {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      await deleteTask(id)
+      const result = await deleteTask(id)
+      if (!result.success) throw new Error(typeof result.error === "string" ? result.error : "Something went wrong")
     },
     onMutate: async (id) => {
       setTasks(prev => prev.filter(t => t.id !== id))
