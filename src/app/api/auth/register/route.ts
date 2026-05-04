@@ -1,33 +1,36 @@
-import { NextResponse } from "next/server"
-import { hash } from "bcryptjs"
-import { db } from "@/lib/db"
+import { db } from "@/lib/db";
+import { userSchema } from "@/lib/schemas";
+import { hash } from "bcryptjs";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { username, password } = await req.json()
-    if (!username || !password) {
-      return NextResponse.json({ message: "Missing credentials" }, { status: 400 })
+    const body = await req.json();
+    const parsed = userSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ message: parsed.error.issues[0].message }, { status: 422 });
     }
+    const { username, password } = parsed.data;
 
     const existingUser = await db.user.findUnique({
-      where: { username }
-    })
+      where: { username },
+    });
 
     if (existingUser) {
-      return NextResponse.json({ message: "User already exists" }, { status: 409 })
+      return NextResponse.json({ message: "User already exists" }, { status: 409 });
     }
 
-    const hashedPassword = await hash(password, 10)
+    const hashedPassword = await hash(password, 10);
 
     await db.user.create({
       data: {
         username,
-        password: hashedPassword
-      }
-    })
+        password: hashedPassword,
+      },
+    });
 
-    return NextResponse.json({ message: "User created successfully" }, { status: 201 })
+    return NextResponse.json({ message: "User created successfully" }, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ message: "Something went wrong" }, { status: 500 })
+    return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
   }
 }
