@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    sri: { algorithm: "sha256" },
+  },
 };
 
 export default nextConfig;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { connection } from "next/server";
 import "./globals.css";
 import Providers from "./providers";
 import Navbar from "./components/Navbar";
@@ -11,11 +12,12 @@ export const metadata: Metadata = {
   description: "A secure, beautiful todo application",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await connection();
   return (
     <html lang="en">
       <body className={`${inter.className} bg-[#0a0a0a] text-white min-h-screen`}>
