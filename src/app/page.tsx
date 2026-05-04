@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { db } from "@/lib/db"
 import TaskTable from "./components/TaskTable"
@@ -8,7 +7,7 @@ import Search from "./components/Search"
 import { Suspense } from "react"
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   
   if (!session?.user) {
     redirect("/login")

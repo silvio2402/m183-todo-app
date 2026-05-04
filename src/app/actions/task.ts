@@ -1,13 +1,12 @@
 "use server"
 import { db } from "@/lib/db"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 
 export async function createTask(title: string, state: string) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session?.user?.id) throw new Error("Unauthorized")
-  
+
   await db.task.create({
     data: { title, state, userId: parseInt(session.user.id) }
   })
@@ -15,9 +14,9 @@ export async function createTask(title: string, state: string) {
 }
 
 export async function updateTaskState(id: number, state: string) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session?.user?.id) throw new Error("Unauthorized")
-  
+
   await db.task.update({
     where: { id, userId: parseInt(session.user.id) },
     data: { state }
@@ -26,9 +25,9 @@ export async function updateTaskState(id: number, state: string) {
 }
 
 export async function updateTask(id: number, title: string, state: string) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session?.user?.id) throw new Error("Unauthorized")
-  
+
   await db.task.update({
     where: { id, userId: parseInt(session.user.id) },
     data: { title, state }
@@ -37,9 +36,9 @@ export async function updateTask(id: number, title: string, state: string) {
 }
 
 export async function deleteTask(id: number) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session?.user?.id) throw new Error("Unauthorized")
-  
+
   await db.task.delete({
     where: { id, userId: parseInt(session.user.id) }
   })
